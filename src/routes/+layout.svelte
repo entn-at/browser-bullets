@@ -7,10 +7,13 @@
 
 <header>
 	<nav>
-		<a href="/" class="brand">Browser Bullets</a>
+		<a href="/" class="brand">Rag Briefing</a>
 		<div class="links">
 			<a href="/" class:active={page.url.pathname === '/'}>Summarize</a>
 			<a href="/urls" class:active={page.url.pathname === '/urls'}>URLs</a>
+			<form method="POST" action="/urls?/clear" class="clear-form">
+				<button type="submit">Clear</button>
+			</form>
 		</div>
 	</nav>
 </header>
@@ -63,5 +66,23 @@
 
 	.links a.active {
 		color: #a78bfa;
+	}
+
+	.clear-form {
+		display: contents;
+	}
+
+	.clear-form button {
+		background: none;
+		border: none;
+		color: #a0a0b0;
+		font-size: 14px;
+		cursor: pointer;
+		padding: 0;
+		font-family: inherit;
+	}
+
+	.clear-form button:hover {
+		color: #f87171;
 	}
 </style>

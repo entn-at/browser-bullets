@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import { addUrl, getUrls } from '$lib/server/urls';
+import { addUrl, getUrls, clearUrls } from '$lib/server/urls';
 import { summarizeUrl } from '$lib/server/summarizeUrl';
 
 export const load: PageServerLoad = () => {
@@ -47,5 +47,9 @@ export const actions: Actions = {
 		}
 
 		return { results };
+	},
+
+	clear: async () => {
+		clearUrls();
 	}
 };
