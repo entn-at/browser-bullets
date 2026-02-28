@@ -2,7 +2,7 @@
 // Paste the MINIFIED version below into a browser bookmark's URL field.
 
 (function () {
-  const SERVER = "http://localhost:3000/summarize";
+  const SERVER = "http://localhost:5173/api/summarize";
 
   // Remove any existing overlay
   const existing = document.getElementById("__bb_overlay");
