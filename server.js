@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const Anthropic = require("@anthropic-ai/sdk");
+const cheerio = require("cheerio");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,11 +13,42 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
+async function scrapeUrl(url) {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (compatible; BrowserBullets/1.0)",
+      Accept: "text/html,application/xhtml+xml",
+    },
+    redirect: "follow",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} fetching URL`);
+  const html = await res.text();
+  const $ = cheerio.load(html);
+  $("script, style, nav, footer, header, aside, noscript, iframe").remove();
+  const text =
+    $("article").text().trim() ||
+    $("main").text().trim() ||
+    $("[role='main']").text().trim() ||
+    $("body").text().trim();
+  return text.replace(/\s+/g, " ").trim();
+}
+
 app.post("/summarize", async (req, res) => {
-  const { text } = req.body;
+  let text = req.body.text;
+  const url = req.body.url;
+
+  if (url) {
+    try {
+      text = await scrapeUrl(url);
+    } catch (err) {
+      return res.status(422).json({ error: `Could not fetch URL: ${err.message}` });
+    }
+  }
 
   if (!text || typeof text !== "string" || text.trim().length === 0) {
-    return res.status(400).json({ error: "Missing or empty 'text' field." });
+    return res
+      .status(400)
+      .json({ error: "No readable text found. Provide 'text' or a valid 'url'." });
   }
 
   const trimmed = text.slice(0, MAX_CHARS);
@@ -39,12 +71,10 @@ ${trimmed}`,
 
     const raw = message.content[0].text.trim();
 
-    // Validate the response is proper JSON with exactly 3 bullets
     let parsed;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      // Try to extract JSON from the response if Claude added any prose
       const match = raw.match(/\{[\s\S]*\}/);
       if (!match) throw new Error("No JSON found in model response.");
       parsed = JSON.parse(match[0]);
