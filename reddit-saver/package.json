@@ -1,0 +1,13 @@
+{
+  "name": "ragtag",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx ts-node reddit-saved.ts",
+    "start:threads": "npx ts-node reddit-saved.ts --with-threads"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.13",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
