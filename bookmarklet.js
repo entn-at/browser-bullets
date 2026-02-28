@@ -5,7 +5,7 @@
 // The server fetches + scrapes the URL, so any public URL works.
 
 (function () {
-  const SERVER = "http://localhost:3000/summarize";
+  const SERVER = "http://localhost:5173/api/summarize";
 
   // Toggle: remove overlay if already open
   const existing = document.getElementById("__bb_overlay");
